@@ -1,59 +1,46 @@
 # dockersap
 Let's test a minisap installation.
 
-Direct and short guide to install SAP NW ABAP 7.52 at home, if you need further details please refer to the #Acknowledgements section.
+This is a direct and short guide to install SAP NW ABAP 7.52 at home, if you need further details please refer to the [Acknowledgements](#acknowledgements) section.
 
 
 ## Installation
 Tested with NW ABAP 7.52 SP04 on different Windows and Linux Ubuntu machines.
 
-1. Register at SAP.com, you will need it to download the installation files and a two test licenses (database and application), at this moment the registration, download and the test license are free of charge.
+1. Register at SAP.com, you will need it to download the installation files and two test licenses (database and application), at this moment the registration, download and the test licenses are free of charge from SAP.
 1. Install Docker, you may need to increase the RAM size (6GB) or Disk limits (100GB).
-1. Set **vm.max_map_count** to avoid an installation error
-
-    - Linux
-        ```sh
-        sysctl -w vm.max_map_count=1000000
-        ```
-
-    - macOS with Docker for Mac
-        ```sh
-        screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty
-        sysctl -w vm.max_map_count=1000000
-        ```
-
-    - Windows and macOS with Docker Toolbox
-        ```sh
-        docker-machine ssh
-        sudo sysctl -w vm.max_map_count=1000000
-        ```
-
-    Finally, check via `sysctl vm.max_map_count` and exit (`ctrl+d`).
 
 1. Clone this repository
 	```sh
-    git clone https://github.com/pmoronm/dockersap
-    cd dockersap
-    ```
-
-1. Download [SAP NetWeaver ABAP 7.52 from SAP](https://developers.sap.com/trials-downloads.html) (search for **7.52**, download Part1 to Part11 and don't forget the License file):
-	- Create the extraction folder:
-		`mkdir sapdownloads`
-	- Extract the download contents into it (use your favorite decompressor tool if you prefer):
-		`unrar x TD752*.rar ./sapdownloads`
-	- Extract the `.lic` file from `License.rar` and copy to the  `sapdownloads/server/TAR/x86_64` folder.
-
-1. Before going any further, you need to tune the installation script to avoid errors with newer opensuse distributions. Backup `sapdownloads/install.sh` and then edit the file, replacing this code fragment:
-	```sh
-	 ./saphostexec -install || do_exit $ERR_install_saphost
-
-		# TODO: is it ok to remove /tmp/hostctrl?
-		cd /
-		rm -rf /tmp/hostctrl || log_echo "Failed to clean up temporary directory"
-
+	git clone https://github.com/pmoronm/dockersap
+	cd dockersap
 	```
 
-with this chunk:
+1. Download [SAP NetWeaver ABAP 7.52 from SAP](https://developers.sap.com/trials-downloads.html) (search for **7.52**, download Part1 to Part11 and don't forget to download the License file as well):
+	- Create the extraction folder:
+    
+	```sh
+	mkdir sapdownloads
+	```
+	- Extract the download contents into it (use your favorite decompressor tool if you prefer):
+
+	```sh
+	unrar x TD752*.rar ./sapdownloads
+	```
+	- Extract the `.lic` file from `License.rar` and copy to the  `sapdownloads/server/TAR/x86_64` folder.
+
+1. Before going any further, you need to tune the installation script to avoid errors with newer opensuse distributions. Create a backup copy of `sapdownloads/install.sh` and then edit the file, replacing this code fragment:
+
+	```sh
+		./saphostexec -install || do_exit $ERR_install_saphost
+
+	# TODO: is it ok to remove /tmp/hostctrl?
+		cd /
+		rm -rf /tmp/hostctrl || log_echo "Failed to clean up temporary directory"
+	```
+
+	with this chunk:
+
 	```sh
 	#Replace this line with one which tries to continue (this) main script using ‘&’:
 		#./saphostexec -install || do_exit $ERR_install_saphost
@@ -72,12 +59,22 @@ with this chunk:
 	```
 
 1. Build the docker image
-	`docker build -t nwabap:7.52 .`
+
+	```sh
+	docker build -t nwabap:7.52 .
+	```
 
 1. Create the container from the image you just built
+
 	```sh
 	docker run -p 8000:8000 -p 44300:44300 -p 3300:3300 -p 3200:3200 -h vhcalnplci --name nwabap752 -it nwabap:7.52 /bin/bash
 	```
+
+1. Now you are inside the container, set **vm.max_map_count** to avoid an installation error
+
+    ```sh
+    sudo sysctl -w vm.max_map_count=1000000
+    ```
 
 1. Run the installation script, should no prompt to accept the disclaimer text appears, hit Ctrl-C once and you'll see it, then accept with 'yes'
 	```sh
@@ -88,7 +85,7 @@ with this chunk:
 After 20 to 30 minutes the installation should success displaying this message:
 	`**Installation of NPL successful**`
 
-1. Stop and exit the container, be sure to learn how to [start](#Starting the SAP container) and [stop](#Stopping the SAP container) your container and then perform the [post-install](#Post Installation Steps).
+1. Stop and exit the container, be sure to learn how to [start](#starting-the-sap-container) and [stop](#stopping-the-sap-container) your container and then perform the [post-install](#Post Installation Steps).
 
 
 ## Starting the SAP container
@@ -112,7 +109,7 @@ After 20 to 30 minutes the installation should success displaying this message:
 ## Post Installation Steps
 1. Install the SAP client.
 
-1. Update the License
+1. Update the License:
 	- Open the client (SAP GUI)
 	- Login **User** SAP*, **Password** Down1oad, **Client** 000
 	- Open transaction `SLICENSE` and copy the key shown at `Active Hardware Key`
@@ -147,18 +144,18 @@ After 20 to 30 minutes the installation should success displaying this message:
 
 
 ## Acknowledgements
-This project wouldn't have been possible without previous work from some great people:
+This project wouldn't have been possible without previous work from some great people, it is built upon such a wonderful help:
+
 [Nabi Zamani](https://blogs.sap.com/2018/05/30/installing-sap-nw-abap-into-docker/),  7.51/7.52 repositories. 
 
-[Julie Plummer] (https://blogs.sap.com/2019/07/01/as-abap-752-sp04-developer-edition-to-download/), always helping.
+[Julie Plummer](https://blogs.sap.com/2019/07/01/as-abap-752-sp04-developer-edition-to-download/), always helping.
 
 [Gregor Wolf](https://bitbucket.org/gregorwolf/dockernwabap750/src/25ca7d78266bef8ed41f1373801fd5e63e0b9552/Dockerfile?at=master&fileviewer=file-view-default), 7.50 repository.
 
 [Tobias Hofman](https://github.com/tobiashofmann/sap-nw-abap-docker/blob/master/Dockerfile), 7.5x running on SuSE.
 
-[Dylan Drummond](https://blogs.sap.com/2021/06/07/adjusting-installer-script-for-sap-netweaver-dev-edition-for-distros-with-kernel-version-5.4-or-higher/), Key update for newer opensuse distributions.
+[Dylan Drummond](https://blogs.sap.com/2021/06/07/adjusting-installer-script-for-sap-netweaver-dev-edition-for-distros-with-kernel-version-5.4-or-higher/), key update for newer opensuse distributions.
 
 
-At this moment you won't be able to install SAP NW ABAP using any of them isolated, but, with this project, I mix all together to achieve a working Repository.
-
+Take into account that none of the above will currently lead you to an installed system, but this repository comes to group them together into a working installation.
 
