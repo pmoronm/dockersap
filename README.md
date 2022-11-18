@@ -82,14 +82,14 @@ Tested with NW ABAP 7.52 SP04 on different Windows and Linux Ubuntu machines.
 	./install.sh
 	```
 
-After 20 to 30 minutes the installation should success displaying this message:
+	After 20 to 30 minutes the installation should success displaying this message:
 	`**Installation of NPL successful**`
 
-1. Stop and exit the container, be sure to learn how to [start](#starting-the-sap-container) and [stop](#stopping-the-sap-container) your container and then perform the [post-install](#Post Installation Steps).
+1. Stop and exit the container, be sure to learn how to [start](#starting-the-sap-container) and [stop](#stopping-the-sap-container) your container and then perform the [post-install](#post-installation-steps).
 
 
 ## Starting the SAP container
-1. For normal operation, you have to start the container before login to your SAP installation: 
+- For normal operation, you have to start the container before login to your SAP installation: 
     ```sh
     docker start -i nwabap752
     /usr/sbin/uuidd
@@ -98,7 +98,7 @@ After 20 to 30 minutes the installation should success displaying this message:
     ```
 
 ## Stopping the SAP container 
-1. Just type in your container console:
+- To stop and exit, just issue the following commands to your container console:
     ```sh
     su npladm
     stopsap
