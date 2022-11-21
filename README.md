@@ -22,12 +22,14 @@ Tested with NW ABAP 7.52 SP04 on different Windows and Linux Ubuntu machines.
 	```sh
 	mkdir sapdownloads
 	```
+	
 	- Extract the download contents into it (use your favorite decompressor tool if you prefer):
 
 	```sh
-	unrar x TD752*.rar ./sapdownloads
+	unrar x [replace-with-download-path]/TD752SP04part01.rar ./sapdownloads/
 	```
-	- Extract the `.lic` file from `License.rar` and copy to the  `sapdownloads/server/TAR/x86_64` folder.
+	
+	- Extract the `.lic` file from `License.rar` and copy it to the  `sapdownloads/server/TAR/x86_64` folder.
 
 1. Before going any further, you need to tune the installation script to avoid errors with newer opensuse distributions. Create a backup copy of `sapdownloads/install.sh` and then edit the file, replacing this code fragment:
 

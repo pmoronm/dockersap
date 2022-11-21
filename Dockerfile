@@ -3,7 +3,9 @@ FROM opensuse/leap:latest
 ENV LANG=en_US.UTF-8
 
 RUN zypper --non-interactive install --replacefiles which hostname expect net-tools iputils wget vim iproute2 unrar less tar gzip uuidd tcsh libaio
-#RUN zypper refresh && zypper --non-interactive up
+# Yes, unfortunatelly we have to manually guarantee all dependencies are ok
+# (Issue with outdated uuidd libraries solved this way)
+RUN zypper refresh && zypper --non-interactive up
 
 # uuidd is needed by nw abap
 RUN mkdir /run/uuidd && chown uuidd /var/run/uuidd && /usr/sbin/uuidd
