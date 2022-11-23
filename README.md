@@ -10,6 +10,12 @@ Tested with NW ABAP 7.52 SP04 on different Windows and Linux Ubuntu machines.
 1. Register at SAP.com, you will need it to download the installation files and two test licenses (database and application), at this moment the registration, download and the test licenses are free of charge from SAP.
 1. Install Docker, you may need to increase the RAM size (6GB) or Disk limits (100GB).
 
+1. Start a system console
+	```sh
+	Windows: Run 'cmd' as Administrator
+	Linux: Start a bash shell
+	```
+
 1. Clone this repository
 	```sh
 	git clone https://github.com/pmoronm/dockersap
@@ -58,6 +64,18 @@ Tested with NW ABAP 7.52 SP04 on different Windows and Linux Ubuntu machines.
 	#Let's not remove the temporary directory, in case saphostexec command
 	#is still executing. So commenting out:
 		# rm -rf /tmp/hostctrl || log_echo "Failed to clean up temporary directory"
+
+	# Now we modify the RUN_NPL executable (executable permissions are for sybnpl user):
+		FILENPL=/sybase/NPL/ASE-16_0/install/RUN_NPL
+		if test -f "$FILENPL"; then
+		  echo "$FILENPL exists. Adding the -T11889 option to config in that file:"
+		  sed -i 's/NPL.cfg \\/NPL.cfg -T11889 \\/g' /sybase/NPL/ASE-16_0/install/RUN_NPL
+		  cat $FILENPL
+		  echo "-T11889 config option added"
+		  sleep 15
+		else
+		  echo "$FILENPL does not exist. Not modifying what doesn’t exist, ontologically seems ok."
+		fi
 	```
 
 1. Build the docker image
@@ -69,16 +87,16 @@ Tested with NW ABAP 7.52 SP04 on different Windows and Linux Ubuntu machines.
 1. Create the container from the image you just built
 
 	```sh
-	docker run -p 8000:8000 -p 44300:44300 -p 3300:3300 -p 3200:3200 -h vhcalnplci --name nwabap752 -it nwabap:7.52 /bin/bash
+	docker run --privileged -p 8000:8000 -p 44300:44300 -p 3300:3300 -p 3200:3200 -h vhcalnplci --name nwabap752 -it nwabap:7.52 /bin/bash
 	```
 
 1. Now you are inside the container, set **vm.max_map_count** to avoid an installation error
 
     ```sh
-    sudo sysctl -w vm.max_map_count=1000000
+    sysctl -w vm.max_map_count=1000000
     ```
 
-1. Run the installation script, should no prompt to accept the disclaimer text appears, hit Ctrl-C once and you'll see it, then accept with 'yes'
+1. Run the installation script, should no prompt to accept the License Agreement text appears, hit Ctrl-C once and you'll see it, then accept with 'yes'
 	```sh
 	/usr/sbin/uuidd
 	./install.sh
